@@ -10,50 +10,58 @@ import java.time.Duration;
 
 public class Driver {
 
-        private static WebDriver driver;
+    private static WebDriver driver;
 
-        private Driver() {
+    private Driver() {
+    }
+
+    public static WebDriver getDriver() {
+        if (driver == null) {
+            switch (ConfigurationReader.getProperty("browser")) {
+                case "chrome":
+                    //WebDriverManager.chromedriver().setup();
+                    driver = new ChromeDriver();
+                    driver.manage().window().maximize();
+                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
+                    break;
+                case "firefox":
+                    //WebDriverManager.firefoxdriver().setup();
+                    driver = new FirefoxDriver();
+                    driver.manage().window().maximize();
+                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
+                    break;
+                case "edge":
+                    //WebDriverManager.edgedriver().setup();
+                    driver = new EdgeDriver();
+                    driver.manage().window().maximize();
+                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
+                    break;
+                case "safari":
+                    //WebDriverManager.safaridriver().setup();
+                    driver = new SafariDriver();
+                    driver.manage().window().maximize();
+                    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
+            }
         }
 
-        public static WebDriver getDriver() {
-            if (driver == null) {
-                switch (ConfigurationReader.getProperty("browser")) {
-                    case "chrome":
-                        //WebDriverManager.chromedriver().setup();
-                        driver = new ChromeDriver();
-                        driver.manage().window().maximize();
-                        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
-                        break;
-                    case "firefox":
-                        //WebDriverManager.firefoxdriver().setup();
-                        driver = new FirefoxDriver();
-                        driver.manage().window().maximize();
-                        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
-                        break;
-                    case "edge":
-                        //WebDriverManager.edgedriver().setup();
-                        driver = new EdgeDriver();
-                        driver.manage().window().maximize();
-                        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
-                        break;
-                    case "safari":
-                        //WebDriverManager.safaridriver().setup();
-                        driver = new SafariDriver();
-                        driver.manage().window().maximize();
-                        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10L));
-                }
-            }
+        return driver;
+    }
 
-            return driver;
-        }
+    public static void closeDriver() {
+        if (driver != null) {
+            driver.quit();
+            driver = null;
 
-        public static void closeDriver() {
-            if (driver != null) {
-                driver.quit();
-                driver = null;
-            }
-
+            bringIntelliJToFront();
         }
     }
 
-
+    private static void bringIntelliJToFront() {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"open", "-a", "IntelliJ IDEA"});
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
